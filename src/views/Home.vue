@@ -32,6 +32,7 @@
 </template>
 
 <script>
+import { mapMutations } from 'vuex';
 export default {
   name: "Home",
   data() {
@@ -41,9 +42,14 @@ export default {
   },
   components: {},
   methods: {
+    ...mapMutations(['toggleInvoice']),
     toggleFilterMenu() {
       this.showFilterMenu = !this.showFilterMenu;
     },
+
+    newInvoice() {
+      this.toggleInvoice();
+    }
   }
 };
 </script>
@@ -75,7 +81,7 @@ export default {
   .filter-menu {
     width: 120px;
     position: absolute;
-    top: 50px;
+    top: 30px;
     list-style: none;
     background-color: #1e2139;
     box-shadow: 

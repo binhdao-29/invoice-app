@@ -3,6 +3,9 @@
     <div v-if="!mobile" class="app flex flex-column">
       <Navigation/>
       <div class="app-content flex flex-column">
+        <transition name="invoice">
+          <InvoiceModal v-show="invoiceModal"/>
+        </transition>
         <router-view />
       </div>
     </div>
@@ -15,11 +18,13 @@
 
 <script>
 import Navigation from './components/Navigation.vue';
+import InvoiceModal from './components/InvoiceModal.vue';
+import { mapState } from 'vuex';
 
 export default {
   data() {
     return {
-      mobile: null
+      mobile: null,
     }
   },
   created() {
@@ -27,7 +32,8 @@ export default {
     window.addEventListener('resize', this.checkScreen);
   },
   components: {
-    Navigation
+    Navigation,
+    InvoiceModal
   },
   methods: {
     checkScreen() {
@@ -38,6 +44,9 @@ export default {
       }
       this.mobile = false;
     }
+  },
+  computed: {
+    ...mapState(['invoiceModal'])
   }
 }
 </script>
@@ -79,6 +88,18 @@ export default {
   p {
     margin-top: 20px;
   }
+}
+
+// animate invoice
+
+.invoice-enter-active,
+.invoice-leave-active {
+  transition: all 0.6s ease-in-out;
+}
+
+.invoice-enter-from,
+.invoice-leave-to {
+  transform: translateX(-700px);
 }
 
 button,

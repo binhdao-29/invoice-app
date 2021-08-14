@@ -82,7 +82,7 @@ export default {
 }
 
 button,
-.button {
+.btn {
   cursor: pointer;
   padding: 16px 24px;
   border-radius: 30px;
@@ -120,6 +120,14 @@ button,
 
 .flex-column {
   flex-direction: column;
+}
+
+.flex-align-center {
+  align-items: center;
+}
+
+.flex-justify-center {
+  justify-content: center;
 }
 
 .container {

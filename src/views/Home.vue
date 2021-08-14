@@ -1,10 +1,120 @@
 <template>
-  <div class="home"></div>
+  <div class="home container">
+    <!-- Header -->
+    <div class="header flex">
+      <div class="flex flex-column">
+        <h1>Invoice</h1>
+        <span>There are 4 total invoices</span>
+      </div>
+      <div class="flex flex-align-center">
+        <div class="filter flex flex-align-center">
+          <span>Filter by status</span>
+          <div @click="toggleFilterMenu" class="filter-icon flex">
+            <img src="@/assets/icon-arrow-down.svg" alt="">
+          </div>
+          <ul v-show="showFilterMenu" class="filter-menu">
+            <li>Draft</li>
+            <li>Pending</li>
+            <li>Paid</li>
+            <li>Clear filter</li>
+          </ul>
+        </div>
+
+        <div @click="newInvoice" class="btn flex flex-align-center">
+          <div class="inner-btn flex">
+            <img src="@/assets/icon-plus.svg" alt="">
+          </div>
+          <span>New Invoice</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 export default {
   name: "Home",
+  data() {
+    return {
+      showFilterMenu: null,
+    }
+  },
   components: {},
+  methods: {
+    toggleFilterMenu() {
+      this.showFilterMenu = !this.showFilterMenu;
+    },
+  }
 };
 </script>
+
+<style lang="scss" scoped>
+.home {
+  color: #fff;
+}
+
+.header {
+  margin-bottom: 65px;
+  justify-content: space-between;
+
+  .filter {
+    position: relative;
+    margin-right: 40px;
+    user-select: none;
+
+    .filter-icon {
+      margin-left: 12px;
+      cursor: pointer;
+
+      img {
+        width: 9px;
+      }
+    }
+  }
+
+  .filter-menu {
+    width: 120px;
+    position: absolute;
+    top: 50px;
+    list-style: none;
+    background-color: #1e2139;
+    box-shadow: 
+      0 4px 6px -1px rgba($color: #000000, $alpha: 0.1),
+      0 2px 4px -1px rgba($color: #000000, $alpha: 0.06);
+
+    li {
+      cursor: pointer;
+      font-size: 12px;
+      padding: 10px 20px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #1e2139;
+        background-color: #fff;
+      }
+    }
+  }
+
+  .btn {
+    padding: 8px 10px;
+    background-color: #7c5dfa;
+    border-radius: 40px;
+
+    .inner-btn {
+      margin-right: 8px;
+      border-radius: 50%;
+      padding: 8px;
+      background-color: #fff;
+    }
+
+    img {
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  span {
+    font-size: 12px;
+  }
+}
+</style>

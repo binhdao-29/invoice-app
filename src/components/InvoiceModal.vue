@@ -83,18 +83,18 @@
       <div class="work-items">
         <h3>Item List</h3>
         <table class="item-list">
-          <tr class="table-heading">
+          <tr class="table-heading flex">
             <th class="item-name">Name</th>
             <th class="item-qty">Quantity</th>
             <th class="item-price">Price</th>
             <th class="item-total">Total</th>
           </tr>
           <tr class="table-items flex" v-for="(item, index) in invoiceItemList" :key="index">
-            <td class="item-name"><input type="text" v-model="item.itemName"></td>
+            <td class="item-name"><input type="text" v-model="item.name"></td>
             <td class="item-qty"><input type="text" v-model="item.qty"></td>
             <td class="item-price"><input type="text" v-model="item.price"></td>
             <td class="item-total flex">${{ item.total = item.qty * item.price }}</td>
-            <img @click="deleteInvoiceItem(item.id)" src="@/assets/icon-delete.svg" alt="">
+            <img @click="deleteInvoiceItem(item.id)" src="@/assets/icon-delete.svg" alt="" class="btn-delete">
           </tr>
         </table>
         <div @click="addNewInvoice" class="btn flex flex-justify-center flex-align-center">
@@ -108,8 +108,8 @@
     <div class="save flex">
       <div @click="closeInvoice" class="btn red flex">Cancel</div>
       <div class="flex">
-        <div @click="saveDraft" class="btn dark-purple">Save Draft</div>
-        <div @click="publishInvoice" class="btn purple">Ceate Invoice</div>
+        <button type="submit" @click="saveDraft" class="btn dark-purple">Save Draft</button>
+        <button type="submit" @click="publishInvoice" class="btn purple">Create Invoice</button>
       </div>
     </div>
   </form>
@@ -118,11 +118,14 @@
 
 <script>
 import { mapMutations } from 'vuex';
+import { uid } from 'uid';
+import db from '../firebase/firebase';
 
 export default {
   name: "invoiceModal",
   data() {
     return {
+      dateOptions : { weekday: 'short', year: 'numeric', month: 'long', day: 'numeric' },
       billerStreetAddress: null,
       billerCity: null,
       billerZipCode: null,
@@ -145,10 +148,90 @@ export default {
       invoiceTotal: 0
     };
   },
+  created() {
+    this.invoiceDateUnix = Date.now();
+    this.invoiceDate = new Date(this.invoiceDateUnix).toLocaleString('en-US', this.dateOptions);
+  },
   methods: {
     ...mapMutations(['toggleInvoice']),
+
     closeInvoice() {
       this.toggleInvoice();
+    },
+
+    addNewInvoice() {
+      this.invoiceItemList.push({
+        id: uid(),
+        name: "",
+        qty: 0,
+        price: 0,
+        total: 0
+      });
+    },
+
+    deleteInvoiceItem(id) {
+      this.invoiceItemList = this.invoiceItemList.filter((item) => item.id != id);
+    },
+
+    calcInvoiceTotal() {
+      this.invoiceTotal = 0;
+      this.invoiceItemList.forEach(item => this.invoiceTotal+= item.total);
+    },
+
+    saveDraft() {
+      this.invoiceDraft = true;
+    },
+
+    publishInvoice() {
+      this.invoicePending = true;
+    },
+
+    async uploadInvoice() {
+      if (this.invoiceItemList.length <= 0) {
+        alert('Please ensure you filled out work items!');
+        return;
+      }
+
+      this.calcInvoiceTotal();
+
+      const dataBase = db.collection('invoices').doc();
+
+      await dataBase.set({
+        invoiceId: uid(6),
+        billerStreetAddress: this.billerStreetAddress,
+        billerCity: this.billerCity,
+        billerZipCode: this.billerZipCode,
+        billerCountry: this.billerCountry,
+        clientName: this.clientName,
+        clientEmail: this.clientEmail,
+        clientStreetAddress: this.clientStreetAddress,
+        clientCity: this.clientCity,
+        clientZipCode: this.clientZipCode,
+        clientCountry: this.clientCountry,
+        invoiceDateUnix: this.invoiceDateUnix,
+        invoiceDate: this.invoiceDate,
+        paymentTerms: this.paymentTerms,
+        paymentDueDateUnix: this.paymentDueDateUnix,
+        paymentDueDate: this.paymentDueDate,
+        productDescription: this.productDescription,
+        invoicePending: this.invoicePending,
+        invoiceDraft: this.invoiceDraft,
+        invoicePaid: null,
+        invoiceItemList: this.invoiceItemList
+      });
+
+      this.toggleInvoice();
+    },
+
+    submitForm() {
+      this.uploadInvoice();
+    }
+  },
+  watch: {
+    paymentTerms() {
+      const futureDate = new Date();
+      this.paymentDueDateUnix = futureDate.setDate(futureDate.getDate() + parseInt(this.paymentTerms));
+      this.paymentDueDate = new Date(this.paymentDueDateUnix).toLocaleString('en-US', this.dateOptions);
     }
   }
 }
@@ -160,6 +243,7 @@ export default {
   top: 0;
   left: 0;
   background: transparent;
+  z-index: 1000;
   width: 100%;
   height: 100vh;
   overflow: scroll;
@@ -231,11 +315,11 @@ export default {
           font-size: 12px;
 
           .item-name {
-            flex-basis: 50%;
+            flex-basis: 45%;
           }
 
           .item-qty {
-            flex-basis: 10%;
+            flex-basis: 15%;
           }
 
           .item-price {
@@ -250,18 +334,25 @@ export default {
 
         .table-heading {
           text-align: left;
+          margin-bottom: 12px;
         }
 
         .table-items {
           position: relative;
           margin-bottom: 24px;
 
-          img {
+          .btn-delete {
             position: absolute;
             top: 15px;
             right: 0;
             width: 12px;
             height: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &:hover {
+              filter: brightness(2);
+            }
           }
         }
       }

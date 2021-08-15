@@ -159,7 +159,13 @@ export default {
     this.invoiceDate = new Date(this.invoiceDateUnix).toLocaleString('en-US', this.dateOptions);
   },
   methods: {
-    ...mapMutations(['toggleInvoice']),
+    ...mapMutations(['toggleInvoice', 'toggleModal']),
+
+    checkClick(e) {
+      if (e.target === this.$refs.invoiceWrap) {
+        this.toggleModal();
+      }
+    },
 
     closeInvoice() {
       this.toggleInvoice();

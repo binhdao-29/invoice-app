@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div v-if="invoiceLoaded">
     <div v-if="!mobile" class="app flex flex-column">
       <Navigation/>
       <div class="app-content flex flex-column">
@@ -21,7 +21,7 @@
 import Navigation from './components/Navigation.vue';
 import InvoiceModal from './components/InvoiceModal.vue';
 import Modal from './components/Modal.vue';
-import { mapState } from 'vuex';
+import { mapState, mapActions } from 'vuex';
 
 export default {
   data() {
@@ -30,6 +30,7 @@ export default {
     }
   },
   created() {
+    this.getInvoices();
     this.checkScreen();
     window.addEventListener('resize', this.checkScreen);
   },
@@ -39,6 +40,8 @@ export default {
     Modal
   },
   methods: {
+    ...mapActions(['getInvoices']),
+
     checkScreen() {
       const windowWidth = window.innerWidth;
       if (windowWidth <= 750) {
@@ -46,10 +49,10 @@ export default {
         return;
       }
       this.mobile = false;
-    }
+    },
   },
   computed: {
-    ...mapState(['invoiceModal', 'modalActive'])
+    ...mapState(['invoiceModal', 'modalActive', 'invoiceLoaded'])
   }
 }
 </script>

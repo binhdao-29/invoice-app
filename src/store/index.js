@@ -19,7 +19,6 @@ export default createStore({
 
     setInvoiceData(state, payload) {
       state.invoicesData.push(payload);
-      console.log(payload);
     },
 
     invoicesLoaded(state) {
@@ -31,7 +30,7 @@ export default createStore({
       const getData = db.collection('invoices');
       const results = await getData.get();
       results.forEach( doc => {
-        if (!state.invoicesData.some(invoiceData => invoiceData.docId !== doc.id)) {
+        if (!state.invoicesData.some(invoiceData => invoiceData.docId === doc.id)) {
           const data = {
             docId: doc.id,
             invoiceId: doc.data().invoiceId,
@@ -53,7 +52,8 @@ export default createStore({
             productDescription: doc.data().productDescription,
             invoicePending: doc.data().invoicePending,
             invoiceDraft: doc.data().invoiceDraft,
-            invoicePaid: doc.data().invoicePaid
+            invoicePaid: doc.data().invoicePaid,
+            invoiceTotal: doc.data().invoiceTotal
           }
           commit('setInvoiceData', data);
         }

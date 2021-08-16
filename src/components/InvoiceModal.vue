@@ -231,7 +231,8 @@ export default {
         invoicePending: this.invoicePending,
         invoiceDraft: this.invoiceDraft,
         invoicePaid: null,
-        invoiceItemList: this.invoiceItemList
+        invoiceItemList: this.invoiceItemList,
+        invoiceTotal: this.invoiceTotal
       });
 
       this.isLoading = false;

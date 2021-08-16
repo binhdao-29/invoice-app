@@ -178,13 +178,16 @@ button,
 .status-button {
   &::before {
     content: "";
+    top: 12px;
+    left: 10px;
     width: 10px;
     height: 10px;
     border-radius: 50%;
     margin-right: 8px;
   }
+  display: flex;
+  width: 130px;
   font-size: 12px;
-  margin-right: 30px;
   align-items: center;
   padding: 8px 30px;
   border-radius: 10px;

@@ -8,6 +8,7 @@ export default createStore({
     invoicesData: [],
     invoiceLoaded: null,
     currentInvoiceArray: null,
+    editInvoice: null,
   },
   mutations: {
     toggleInvoice(state) {
@@ -28,6 +29,33 @@ export default createStore({
 
     setCurrentInvoice(state, payload) {
       state.currentInvoiceArray = state.invoicesData.filter(invoice => invoice.invoiceId === payload);
+    },
+
+    toggleEditInvoice(state) {
+      state.editInvoice = !state.editInvoice;
+    },
+
+    deleteInvoice(state, payload) {
+      state.invoicesData = state.invoicesData.filter(invoice => invoice.docId !== payload);
+    },
+
+    updateStatusToPaid(state, payload) {
+      state.invoicesData.forEach(invoice => {
+        if (invoice.docId === payload) {
+          invoice.invoicePaid = true;
+          invoice.invoicePending = false;
+        }
+      });
+    },
+
+    updateStatusToPending(state, payload) {
+      state.invoicesData.forEach(invoice => {
+        if (invoice.docId === payload) {
+          invoice.invoicePaid = false;
+          invoice.invoicePending = true;
+          invoice.invoiceDraft = false;
+        }
+      });
     }
   },
   actions: {
@@ -65,6 +93,39 @@ export default createStore({
         }
       });
       commit('invoicesLoaded');
+    },
+
+    async updateInvoiceStore({ commit, dispatch }, { docId, routeId }) {
+      commit('deleteInvoice', docId); //xoa invoice can update trong list hien thoi
+      await dispatch('getInvoices');
+      commit('toggleInvoice');
+      commit('toggleEditInvoice');
+      commit('setCurrentInvoice', routeId);
+    },
+
+    async deleteInvoiceStore({ commit }, docId) {
+      const invoice = db.collection('invoices').doc(docId);
+      await invoice.delete();
+      commit('deleteInvoice', docId);
+    },
+
+    async updateStatusToPaid({ commit }, docId) {
+      const invoice = db.collection('invoices').doc(docId);
+      await invoice.update({
+        invoicePaid: true,
+        invoicePending: false
+      });
+      commit('updateStatusToPaid', docId);
+    },
+
+    async updateStatusToPending({ commit }, docId) {
+      const invoice = db.collection('invoices').doc(docId);
+      await invoice.update({
+        invoicePaid: false,
+        invoicePending: true,
+        invoiceDraft: false
+      });
+      commit('updateStatusToPending', docId);
     }
   }
 })

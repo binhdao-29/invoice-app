@@ -12,13 +12,12 @@ export default {
 
 <style lang="scss">
 .loading {
-  top: 200px;
-  left: 0;
+  position: absolute;
+  inset: 0;
   z-index: 101;
   height: 100%;
   width: 100%;
   background-color: rgba(0, 0, 0, 0.5);
-  position: absolute;
   display: flex;
   justify-content: center;
   align-items: center;

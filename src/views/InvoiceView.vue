@@ -5,22 +5,25 @@
       <span>Go back</span>
     </router-link>
 
+    <!-- Loading -->
+    <Loading v-show="isLoading" />
+
     <!-- Header -->
     <div class="header flex">
       <div class="header-left flex flex-align-center">
         <span>Status</span>
          <div class="status-button" 
               :class="{ paid: currentInvoice.invoicePaid, draft: currentInvoice.invoiceDraft, pending: currentInvoice.invoicePending }">
-          <span v-if="currentInvoice.invoiePaid">Paid</span>
+          <span v-if="currentInvoice.invoicePaid">Paid</span>
           <span v-if="currentInvoice.invoiceDraft">Draft</span>
           <span v-if="currentInvoice.invoicePending">Pending</span>
         </div>
       </div>
       <div class="header-right flex flex-align-center">
-        <button @click="toggleEditInvoice(currentInvoice.docId)" class="btn dark-purple">Edit</button>
+        <button @click="openEditInvoice" class="btn dark-purple">Edit</button>
         <button @click="deleteInvoice(currentInvoice.docId)" class="btn red">Delete</button>
-        <button v-if="currentInvoice.invoicePending" @click="updateStatusToPaid(currentInvoice.docId)" class="btn green">Mark as Paid</button>
-        <button v-if="currentInvoice.invoiceDraft || currentInvoice.invoiePaid" @click="updateStatusToPending" class="btn orange">Mark as Pending</button>
+        <button v-if="currentInvoice.invoicePending" @click="updateToPaid(currentInvoice.docId)" class="btn green">Mark as Paid</button>
+        <button v-if="currentInvoice.invoiceDraft || currentInvoice.invoicePaid" @click="updateToPending(currentInvoice.docId)" class="btn orange">Mark as Pending</button>
       </div>
     </div>
 
@@ -92,29 +95,62 @@
 </template>
 
 <script>
-import { mapMutations, mapState } from 'vuex';
+import { mapActions, mapMutations, mapState } from 'vuex';
+import Loading from '../components/Loading.vue';
 
 export default {
   name: "InvoiceView",
   data() {
     return {
-      currentInvoice: null
+      currentInvoice: null,
+      isLoading: false
     }
   },
   created() {
     this.getCurrenInvoice();
-    console.log(this.currentInvoice);
   },
+  components: { Loading },
   methods: {
-    ...mapMutations(['setCurrentInvoice']),
+    ...mapMutations(['setCurrentInvoice', 'toggleEditInvoice', 'toggleInvoice']),
+
+    ...mapActions(['deleteInvoiceStore', 'updateStatusToPending', 'updateStatusToPaid']),
 
     getCurrenInvoice() {
       this.setCurrentInvoice(this.$route.params.invoiceId);
       this.currentInvoice = this.currentInvoiceArray[0];
+    },
+
+    openEditInvoice() {
+      this.toggleEditInvoice();
+      this.toggleInvoice();
+    },
+
+    async deleteInvoice(docId) {
+      await this.deleteInvoiceStore(docId);
+      this.isLoading = true;
+      setTimeout(() => {
+        this.isLoading = false;
+        this.$router.push({ name: "Home" });
+      }, 500);
+    },
+    
+    updateToPaid(docId) {
+      this.updateStatusToPaid(docId);
+    },
+
+    updateToPending(docId) {
+      this.updateStatusToPending(docId);
     }
   },
   computed: {
-    ...mapState(['currentInvoiceArray'])
+    ...mapState(['currentInvoiceArray', 'editInvoice'])
+  }, 
+  watch: {
+    editInvoice() {
+      if (!this.editInvoice) {
+        this.currentInvoice = this.currentInvoiceArray[0];
+      }
+    }
   }
 }
 </script>

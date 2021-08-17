@@ -5,7 +5,7 @@
       <div class="app-content flex flex-column">
         <Modal v-if="modalActive"/>
         <transition name="invoice">
-          <InvoiceModal v-show="invoiceModal"/>
+          <InvoiceModal v-if="invoiceModal"/>
         </transition>
         <router-view />
       </div>
@@ -169,6 +169,7 @@ button,
 }
 
 .nav-link {
+  max-width: 10%;
   text-decoration: none;
   color: initial;
 }

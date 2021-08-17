@@ -191,7 +191,7 @@ export default {
   methods: {
     ...mapMutations(['toggleInvoice', 'toggleModal', 'toggleEditInvoice']),
 
-    ...mapActions(['updateInvoiceStore']),
+    ...mapActions(['updateInvoiceStore', 'getInvoices']),
 
     checkClick(e) {
       if (e.target === this.$refs.invoiceWrap) {
@@ -274,6 +274,7 @@ export default {
       this.isLoading = false;
 
       this.toggleInvoice();
+      this.getInvoices();
     },
 
     async updateInvoice() {
@@ -318,14 +319,11 @@ export default {
     },
 
     submitForm() {
-      console.log(this.editInvoice);
-
       if (this.editInvoice) {
         this.updateInvoice();
         return;
       }
 
-      console.log(this.editInvoice);
       this.uploadInvoice();
     }
   },

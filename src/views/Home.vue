@@ -4,19 +4,19 @@
     <div class="header flex">
       <div class="flex flex-column">
         <h1>Invoice</h1>
-        <span>There are 4 total invoices</span>
+        <span>There are {{ invoicesData.length }} total invoices</span>
       </div>
       <div class="flex flex-align-center">
-        <div class="filter flex flex-align-center">
-          <span>Filter by status</span>
-          <div @click="toggleFilterMenu" class="filter-icon flex">
+        <div @click="toggleFilterMenu" class="filter flex flex-align-center">
+          <span>Filter by status<span v-if="filteredInvoice">: {{ filteredInvoice }}</span></span>
+          <div class="filter-icon flex">
             <img src="@/assets/icon-arrow-down.svg" alt="">
           </div>
           <ul v-show="showFilterMenu" class="filter-menu">
-            <li>Draft</li>
-            <li>Pending</li>
-            <li>Paid</li>
-            <li>Clear filter</li>
+            <li @click="filterInvoice">Draft</li>
+            <li @click="filterInvoice">Pending</li>
+            <li @click="filterInvoice">Paid</li>
+            <li @click="filterInvoice">Clear filter</li>
           </ul>
         </div>
 
@@ -31,7 +31,7 @@
 
     <!-- Invoice -->
     <div v-if="invoicesData.length > 0">
-      <Invoice v-for="(invoice, index) in invoicesData" :invoice="invoice" :key="index" />
+      <Invoice v-for="(invoice, index) in filteredData" :invoice="invoice" :key="index" />
     </div>
     <div v-else class="empty flex flex-column flex-align-center flex-justify-center">
       <img src="@/assets/illustration-empty.svg" alt="">
@@ -50,6 +50,7 @@ export default {
   data() {
     return {
       showFilterMenu: null,
+      filteredInvoice: null,
     }
   },
   components: { Invoice },
@@ -61,10 +62,34 @@ export default {
 
     newInvoice() {
       this.toggleInvoice();
+    },
+
+    filterInvoice(e) {
+      if (e.target.innerText === 'Clear filter') {
+        this.filteredInvoice = null;
+        return;
+      }
+      this.filteredInvoice = e.target.innerText;
     }
   },
   computed: {
-    ...mapState(['invoicesData'])
+    ...mapState(['invoicesData']),
+
+    filteredData() {
+      return this.invoicesData.filter(invoice => {
+        if (this.filteredInvoice === 'Paid') {
+          return invoice.invoicePaid === true;
+        }
+        if (this.filteredInvoice === 'Pending') {
+          return invoice.invoicePending === true;
+        }
+        if (this.filteredInvoice === 'Draft') {
+          return invoice.invoiceDraft === true;
+        }
+
+        return invoice;
+      });
+    }
   }
 };
 </script>
@@ -97,10 +122,10 @@ export default {
     position: relative;
     margin-right: 40px;
     user-select: none;
+    cursor: pointer;
 
     .filter-icon {
       margin-left: 12px;
-      cursor: pointer;
 
       img {
         width: 9px;

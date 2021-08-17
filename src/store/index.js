@@ -7,6 +7,7 @@ export default createStore({
     modalActive: false,
     invoicesData: [],
     invoiceLoaded: null,
+    currentInvoiceArray: null,
   },
   mutations: {
     toggleInvoice(state) {
@@ -23,6 +24,10 @@ export default createStore({
 
     invoicesLoaded(state) {
       state.invoiceLoaded = true;
+    },
+
+    setCurrentInvoice(state, payload) {
+      state.currentInvoiceArray = state.invoicesData.filter(invoice => invoice.invoiceId === payload);
     }
   },
   actions: {
@@ -53,7 +58,8 @@ export default createStore({
             invoicePending: doc.data().invoicePending,
             invoiceDraft: doc.data().invoiceDraft,
             invoicePaid: doc.data().invoicePaid,
-            invoiceTotal: doc.data().invoiceTotal
+            invoiceTotal: doc.data().invoiceTotal,
+            invoiceItemList: doc.data().invoiceItemList
           }
           commit('setInvoiceData', data);
         }
